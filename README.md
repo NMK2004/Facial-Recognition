@@ -18,12 +18,8 @@
 ## Kết quả
 Chương trình có khả năng phát hiện và nhận diện khuôn mặt thông qua webcam với độ chính xác tương đối trong điều kiện ánh sáng phù hợp.
 ## Ghi chú
-Webcam phải hoạt động để chương trình chạy đúng
-Không commit các file build, file thực thi (.exe)
-Project mang tính học tập và nghiên cứu
+- Webcam phải hoạt động để chương trình chạy đúng
+- Không commit các file build, file thực thi (.exe)
+- Project mang tính học tập và nghiên cứu
 ## Tác giả
-Nguyễn Mậu Khải
-
-Sinh viên thực hiện: (điền tên bạn)
-
-Nhóm: (điền tên nhóm)
+- Sinh viên thực hiện: Nguyễn Mậu Khải
