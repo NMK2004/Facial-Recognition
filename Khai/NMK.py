@@ -7,16 +7,9 @@ from PIL import Image, ImageFont, ImageDraw
 import customtkinter as ctk
 from tkinter import messagebox, simpledialog
 from threading import Thread
+from fastapi import FastAPI
+import uvicorn
 
-# =========================================
-# HÀM LẤY ĐƯỜNG DẪN RESOURCE (khi chạy exe)
-# =========================================
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS  # khi build exe bằng PyInstaller
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
 
 # Thư mục dữ liệu
 BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -26,6 +19,34 @@ DB_PATH = os.path.join(BASE_DIR, "data.db")
 CASCADE_PATH = os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml")
 MODEL_PATH = os.path.join(RECOGNIZER_DIR, "trainningData.yml")
 FONT_PATH = os.path.join(BASE_DIR, "arial.ttf")
+
+app_api = FastAPI()
+
+@app_api.get("/user/{user_id}")
+def get_user_info(user_id: int):
+    # Sử dụng trực tiếp DB_PATH đã định nghĩa ở trên đầu file của bạn
+    conn = sqlite3.connect(DB_PATH) 
+    cursor = conn.execute("SELECT * FROM people WHERE id=?", (user_id,))
+    profile = cursor.fetchone()
+    conn.close()
+    
+    if profile:
+        return {"id": profile[0], "name": profile[1], "status": "success"}
+    return {"status": "error", "message": "User not found"}
+
+def start_api():
+    # Chỉ chạy Server ở đây, KHÔNG gọi run_gui() ở đây nữa
+    uvicorn.run(app_api, host="0.0.0.0", port=8000)
+ 
+# =========================================
+# HÀM LẤY ĐƯỜNG DẪN RESOURCE (khi chạy exe)
+# =========================================
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS  # khi build exe bằng PyInstaller
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 
 # =========================================
@@ -321,4 +342,9 @@ def run_gui():
 
 
 if __name__ == "__main__":
+    # 1. Mở "luồng phụ" để chạy API (chạy ngầm)
+    api_thread = Thread(target=start_api, daemon=True)
+    api_thread.start()
+    
+    # 2. Chạy "luồng chính" là Giao diện (chạy nổi trên màn hình)
     run_gui()
